@@ -110,7 +110,7 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
                 <span>{match.awayScore}</span>
               </div>
               {match.homeET !== null && match.awayET !== null && (
-                <div className="text-[11px] font-semibold text-blue-500">
+                <div className="text-[11px] font-semibold text-muted-foreground">
                   ET: {match.homeET} x {match.awayET}
                 </div>
               )}
@@ -159,14 +159,14 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
               {knockout ? "Placar nos 90 minutos" : "Placar final"}
             </p>
             <div className="flex items-center justify-center gap-4">
-              <Stepper value={home} onChange={setHome} label={home_team.name} dark />
+              <Stepper value={home} onChange={setHome} label={home_team.name} />
               <span className="pb-6 text-lg font-bold text-muted-foreground">x</span>
-              <Stepper value={away} onChange={setAway} label={away_team.name} dark />
+              <Stepper value={away} onChange={setAway} label={away_team.name} />
             </div>
 
             {/* Prorrogação */}
             {showET && (
-              <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
+              <div className="rounded-xl bg-muted border border-border p-3">
                 <p className="mb-2 text-center text-xs font-bold text-foreground">
                   ⏱️ Empate → placar na prorrogação?
                 </p>
@@ -176,7 +176,7 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
                   <Stepper value={awayET} onChange={setAwayET} label={away_team.name} min={0} />
                 </div>
                 {homeET === awayET && (
-                  <p className="mt-1 text-center text-[11px] text-blue-600 dark:text-blue-400">
+                  <p className="mt-1 text-center text-[11px] text-muted-foreground">
                     Empatou na ET → defina quem vence nos pênaltis abaixo
                   </p>
                 )}
@@ -185,8 +185,8 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
 
             {/* Pênaltis */}
             {showPenalties && (
-              <div className="rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
-                <p className="mb-2 text-center text-xs font-bold text-amber-700 dark:text-amber-400">
+              <div className="rounded-xl bg-muted border border-border p-3">
+                <p className="mb-2 text-center text-xs font-bold text-foreground">
                   ⚽ Placar nos pênaltis
                 </p>
                 <div className="flex items-center justify-center gap-3">
@@ -195,7 +195,7 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
                   <Stepper value={awayPen} onChange={setAwayPen} label={away_team.name} min={0} />
                 </div>
                 {homePen === awayPen && homePen > 0 && (
-                  <p className="mt-1 text-center text-xs text-red-500">Pênaltis não podem empatar!</p>
+                  <p className="mt-1 text-center text-xs text-destructive font-medium">Pênaltis não podem empatar!</p>
                 )}
               </div>
             )}
@@ -205,7 +205,7 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
             </Button>
 
             {knockout && (
-              <p className="text-center text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+              <p className="text-center text-[11px] text-primary font-medium">
                 🏆 Fase eliminatória — placar exato + prorrogação + pênaltis vale até 22 pts!
               </p>
             )}
@@ -255,7 +255,7 @@ function StatusBadge({ status, kickoff }: { status: "upcoming" | "live" | "finis
   )
 }
 
-function Stepper({ value, onChange, label, min = 0, dark = false }: { value: number; onChange: (v: number) => void; label: string; min?: number; dark?: boolean }) {
+function Stepper({ value, onChange, label, min = 0 }: { value: number; onChange: (v: number) => void; label: string; min?: number }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
       <div className="flex items-center gap-2">
@@ -267,7 +267,7 @@ function Stepper({ value, onChange, label, min = 0, dark = false }: { value: num
         >
           <Minus className="size-4" />
         </button>
-        <span className={`w-8 text-center text-2xl font-extrabold tabular-nums ${dark ? "text-white" : "text-gray-900"}`}>{value}</span>
+        <span className="w-8 text-center text-2xl font-extrabold tabular-nums text-foreground">{value}</span>
         <button
           type="button"
           onClick={() => onChange(Math.min(20, value + 1))}
@@ -276,7 +276,7 @@ function Stepper({ value, onChange, label, min = 0, dark = false }: { value: num
           <Plus className="size-4" />
         </button>
       </div>
-      <span className={`max-w-[5.5rem] truncate text-center text-[11px] font-medium ${dark ? "text-white/70" : "text-gray-600"}`}>{label}</span>
+      <span className="max-w-[5.5rem] truncate text-center text-[11px] font-medium text-muted-foreground">{label}</span>
     </div>
   )
 }
@@ -292,10 +292,10 @@ function pointsLabel(pts: number): string {
 }
 
 function pointsColor(pts: number): string {
-  if (pts === 22) return "bg-yellow-400 text-yellow-900"
-  if (pts === 17) return "bg-orange-500 text-white"
+  if (pts === 22) return "bg-yellow-400 text-yellow-900 dark:bg-yellow-500 dark:text-yellow-950"
+  if (pts === 17) return "bg-orange-500 text-white dark:bg-orange-400 dark:text-orange-950"
   if (pts === 12) return "bg-primary text-primary-foreground"
-  if (pts === 5)  return "bg-blue-500 text-white"
+  if (pts === 5)  return "bg-blue-500 text-white dark:bg-blue-400 dark:text-blue-950"
   if (pts === 3)  return "bg-primary text-primary-foreground"
   if (pts === 1)  return "bg-accent text-accent-foreground"
   return "bg-muted text-muted-foreground"

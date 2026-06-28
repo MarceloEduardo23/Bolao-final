@@ -254,7 +254,7 @@ function LegendCard() {
           Acertou o placar exato
         </li>
         <li className="flex items-center gap-2">
-          <span className="rounded-full bg-blue-500 px-2 py-0.5 font-bold text-white">+2</span>
+          <span className="rounded-full bg-blue-500 dark:bg-blue-400 px-2 py-0.5 font-bold text-white dark:text-blue-950">+2</span>
           Acertou vencedor nos pênaltis (empate apostado)
         </li>
         <li className="flex items-center gap-2">
