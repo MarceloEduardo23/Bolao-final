@@ -1,0 +1,301 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-geist-sans), 'Geist Fallback';
+  --font-mono: var(--font-geist-mono), 'Geist Mono Fallback';
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* ── Copa do Mundo 2026 – paleta oficial ── */
+  color-scheme: light;
+
+  /* Fundo: branco levíssimo, não chapado */
+  --background: oklch(0.98 0.003 260);
+  --foreground: oklch(0.12 0.015 260);
+
+  /* Cards: branco puro com leve sombra */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0.015 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.12 0.015 260);
+
+  /* Primary: roxo vibrante da Copa (#6B22CC aprox) */
+  --primary: oklch(0.48 0.22 293);
+  --primary-foreground: oklch(0.99 0 0);
+
+  /* Secondary: ciano/turquesa da Copa (#00C9C8 aprox) */
+  --secondary: oklch(0.92 0.04 200);
+  --secondary-foreground: oklch(0.18 0.04 200);
+
+  /* Muted */
+  --muted: oklch(0.94 0.01 260);
+  --muted-foreground: oklch(0.5 0.02 260);
+
+  /* Accent: vermelho vibrante da Copa */
+  --accent: oklch(0.55 0.23 27);
+  --accent-foreground: oklch(0.99 0 0);
+
+  --destructive: oklch(0.58 0.22 27);
+  --border: oklch(0.88 0.015 260);
+  --input: oklch(0.88 0.015 260);
+  --ring: oklch(0.48 0.22 293);
+
+  /* Charts nas cores da Copa */
+  --chart-1: oklch(0.48 0.22 293);   /* roxo */
+  --chart-2: oklch(0.72 0.19 195);   /* ciano */
+  --chart-3: oklch(0.55 0.23 27);    /* vermelho */
+  --chart-4: oklch(0.82 0.2 95);     /* amarelo */
+  --chart-5: oklch(0.55 0.18 155);   /* verde */
+
+  --radius: 0.875rem;
+
+  --sidebar: oklch(0.97 0.005 260);
+  --sidebar-foreground: oklch(0.12 0.015 260);
+  --sidebar-primary: oklch(0.48 0.22 293);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.92 0.04 200);
+  --sidebar-accent-foreground: oklch(0.18 0.04 200);
+  --sidebar-border: oklch(0.88 0.015 260);
+  --sidebar-ring: oklch(0.48 0.22 293);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.13 0.01 260);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.18 0.01 260);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.18 0.01 260);
+  --popover-foreground: oklch(0.97 0 0);
+  /* Primary: roxo vibrante da Copa, mais saturado no dark */
+  --primary: oklch(0.62 0.24 293);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.24 0.02 260);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.22 0.01 260);
+  --muted-foreground: oklch(0.62 0.02 260);
+  /* Accent: ciano da Copa no dark */
+  --accent: oklch(0.68 0.18 195);
+  --accent-foreground: oklch(0.10 0.02 195);
+  --destructive: oklch(0.65 0.22 27);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.62 0.24 293);
+  --chart-1: oklch(0.62 0.24 293);
+  --chart-2: oklch(0.68 0.18 195);
+  --chart-3: oklch(0.65 0.22 27);
+  --chart-4: oklch(0.82 0.2 95);
+  --chart-5: oklch(0.62 0.18 155);
+  --sidebar: oklch(0.16 0.01 260);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.62 0.24 293);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.24 0.02 260);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.62 0.24 293);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+    --background: oklch(0.13 0.01 260);
+    --foreground: oklch(0.97 0 0);
+    --card: oklch(0.18 0.01 260);
+    --card-foreground: oklch(0.97 0 0);
+    --popover: oklch(0.18 0.01 260);
+    --popover-foreground: oklch(0.97 0 0);
+    --primary: oklch(0.62 0.24 293);
+    --primary-foreground: oklch(0.99 0 0);
+    --secondary: oklch(0.24 0.02 260);
+    --secondary-foreground: oklch(0.97 0 0);
+    --muted: oklch(0.22 0.01 260);
+    --muted-foreground: oklch(0.62 0.02 260);
+    --accent: oklch(0.68 0.18 195);
+    --accent-foreground: oklch(0.10 0.02 195);
+    --destructive: oklch(0.65 0.22 27);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 12%);
+    --ring: oklch(0.62 0.24 293);
+    --chart-1: oklch(0.62 0.24 293);
+    --chart-2: oklch(0.68 0.18 195);
+    --chart-3: oklch(0.65 0.22 27);
+    --chart-4: oklch(0.82 0.2 95);
+    --chart-5: oklch(0.62 0.18 155);
+    --sidebar: oklch(0.16 0.01 260);
+    --sidebar-foreground: oklch(0.97 0 0);
+    --sidebar-primary: oklch(0.62 0.24 293);
+    --sidebar-primary-foreground: oklch(0.99 0 0);
+    --sidebar-accent: oklch(0.24 0.02 260);
+    --sidebar-accent-foreground: oklch(0.97 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.62 0.24 293);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* Logo oficial da Copa 2026 repetida como watermark */
+    background-image: url('/public/Logo.png');
+    background-size: 220px auto;
+    background-repeat: repeat;
+    background-attachment: fixed;
+    position: relative;
+  }
+  /* Overlay pra logo não competir com o conteúdo */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: var(--background);
+    opacity: 1;
+    pointer-events: none;
+    z-index: 0;
+  }
+  main, header, nav {
+    position: relative;
+    z-index: 1;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* ── Hero da Copa 2026: faixa colorida estilo identidade visual ── */
+.copa-hero {
+  background: linear-gradient(135deg,
+    #6B22CC 0%,
+    #9B22E8 20%,
+    #00C9C8 40%,
+    #E62E2E 60%,
+    #FFD700 80%,
+    #6B22CC 100%
+  );
+  background-size: 300% 300%;
+  animation: hero-shift 8s ease infinite;
+}
+
+@keyframes hero-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Override do hero existente para usar as cores da Copa */
+section.animate-slide-up.overflow-hidden.rounded-3xl.bg-primary {
+  background: linear-gradient(135deg, oklch(0.48 0.22 293), oklch(0.62 0.22 195)) !important;
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ball-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ball-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-22px);
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
