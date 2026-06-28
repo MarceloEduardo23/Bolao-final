@@ -154,12 +154,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return state.predictions.find((p) => p.matchId === matchId)
   }, [state.predictions])
 
-  const setPrediction = useCallback(async (matchId: string, home: number, away: number, homePenalties?: number | null, awayPenalties?: number | null) => {
+  const setPrediction = useCallback(async (matchId: string, home: number, away: number, homePenalties?: number | null, awayPenalties?: number | null, homeET?: number | null, awayET?: number | null) => {
     if (!state.currentUser) return { ok: false, error: "Você precisa estar logado." }
-    const res = await apiFetch("/api/predictions", { method: "POST", body: JSON.stringify({ matchId, home, away, homePenalties: homePenalties ?? null, awayPenalties: awayPenalties ?? null }) }, state.token)
+    const res = await apiFetch("/api/predictions", { method: "POST", body: JSON.stringify({ matchId, home, away, homeET: homeET ?? null, awayET: awayET ?? null, homePenalties: homePenalties ?? null, awayPenalties: awayPenalties ?? null }) }, state.token)
     const data = await res.json()
     if (!res.ok) return { ok: false, error: data.error ?? "Não foi possível salvar." }
-    const newPred = { matchId, userId: state.currentUser.id, home, away, homePenalties: homePenalties ?? null, awayPenalties: awayPenalties ?? null, createdAt: new Date().toISOString() }
+    const newPred = { matchId, userId: state.currentUser.id, home, away, homeET: homeET ?? null, awayET: awayET ?? null, homePenalties: homePenalties ?? null, awayPenalties: awayPenalties ?? null, createdAt: new Date().toISOString() }
     setState((s) => ({ ...s, predictions: [...s.predictions.filter(p => p.matchId !== matchId || p.userId !== state.currentUser!.id), newPred] }))
     return { ok: true }
   }, [state.currentUser, state.token])
@@ -181,7 +181,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const updateMatch = useCallback(async (match: Match) => {
     await apiFetch("/api/matches", {
       method: "PATCH",
-      body: JSON.stringify({ id: match.id, homeScore: match.homeScore, awayScore: match.awayScore, finished: match.finished, kickoff: match.kickoff, homePenalties: match.homePenalties ?? null, awayPenalties: match.awayPenalties ?? null }),
+      body: JSON.stringify({ id: match.id, homeScore: match.homeScore, awayScore: match.awayScore, finished: match.finished, kickoff: match.kickoff, homeET: match.homeET ?? null, awayET: match.awayET ?? null, homePenalties: match.homePenalties ?? null, awayPenalties: match.awayPenalties ?? null }),
     }, state.token)
     setState((s) => ({ ...s, matches: s.matches.map((m) => (m.id === match.id ? match : m)) }))
   }, [state.token])

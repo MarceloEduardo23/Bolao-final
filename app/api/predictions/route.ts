@@ -2,14 +2,14 @@ import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import { getSessionUser } from "@/lib/auth"
 
-// GET /api/predictions — returns all predictions for current user
 export async function GET(req: Request) {
   const session = await getSessionUser(req)
   if (!session) return NextResponse.json({ predictions: [] })
 
-  // Garante colunas de pênaltis existem
   await sql`ALTER TABLE predictions ADD COLUMN IF NOT EXISTS home_penalties INT`
   await sql`ALTER TABLE predictions ADD COLUMN IF NOT EXISTS away_penalties INT`
+  await sql`ALTER TABLE predictions ADD COLUMN IF NOT EXISTS home_et INT`
+  await sql`ALTER TABLE predictions ADD COLUMN IF NOT EXISTS away_et INT`
 
   const rows = await sql`
     SELECT
@@ -17,6 +17,8 @@ export async function GET(req: Request) {
       user_id           AS "userId",
       home,
       away,
+      home_et           AS "homeET",
+      away_et           AS "awayET",
       home_penalties    AS "homePenalties",
       away_penalties    AS "awayPenalties",
       created_at        AS "createdAt"
@@ -27,22 +29,22 @@ export async function GET(req: Request) {
   return NextResponse.json({ predictions: rows })
 }
 
-// POST /api/predictions — submit a prediction
 export async function POST(req: Request) {
   const session = await getSessionUser(req)
   if (!session) {
     return NextResponse.json({ error: "Você precisa estar logado." }, { status: 401 })
   }
 
-  const { matchId, home, away, homePenalties, awayPenalties } = await req.json()
+  const { matchId, home, away, homeET, awayET, homePenalties, awayPenalties } = await req.json()
 
   if (!matchId || home === undefined || away === undefined) {
     return NextResponse.json({ error: "Dados inválidos." }, { status: 400 })
   }
 
-  // Garante colunas de pênaltis existem
   await sql`ALTER TABLE predictions ADD COLUMN IF NOT EXISTS home_penalties INT`
   await sql`ALTER TABLE predictions ADD COLUMN IF NOT EXISTS away_penalties INT`
+  await sql`ALTER TABLE predictions ADD COLUMN IF NOT EXISTS home_et INT`
+  await sql`ALTER TABLE predictions ADD COLUMN IF NOT EXISTS away_et INT`
 
   const matches = await sql`
     SELECT id, kickoff, finished, stage FROM matches WHERE id = ${matchId} LIMIT 1
@@ -57,12 +59,14 @@ export async function POST(req: Request) {
   }
 
   await sql`
-    INSERT INTO predictions (match_id, user_id, home, away, home_penalties, away_penalties)
-    VALUES (${matchId}, ${session.sub}, ${home}, ${away}, ${homePenalties ?? null}, ${awayPenalties ?? null})
+    INSERT INTO predictions (match_id, user_id, home, away, home_et, away_et, home_penalties, away_penalties)
+    VALUES (${matchId}, ${session.sub}, ${home}, ${away}, ${homeET ?? null}, ${awayET ?? null}, ${homePenalties ?? null}, ${awayPenalties ?? null})
     ON CONFLICT (match_id, user_id)
     DO UPDATE SET
       home = EXCLUDED.home,
       away = EXCLUDED.away,
+      home_et = EXCLUDED.home_et,
+      away_et = EXCLUDED.away_et,
       home_penalties = EXCLUDED.home_penalties,
       away_penalties = EXCLUDED.away_penalties,
       created_at = NOW()

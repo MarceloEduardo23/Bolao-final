@@ -8,11 +8,14 @@ export interface Match {
   awayId: string
   // ISO datetime de início do jogo
   kickoff: string
-  // resultado oficial (preenchido pelo admin quando o jogo acaba)
+  // Resultado nos 90 minutos
   homeScore: number | null
   awayScore: number | null
   finished: boolean
-  // Penaltis (apenas em caso de empate no tempo normal em jogos eliminatórios)
+  // Prorrogação (apenas em jogos eliminatórios que foram para ET)
+  homeET: number | null   // placar após prorrogação (inclui os 90')
+  awayET: number | null
+  // Pênaltis (apenas se ainda empatado após prorrogação)
   homePenalties: number | null
   awayPenalties: number | null
 }

@@ -81,7 +81,7 @@ export default function HomePage() {
           {currentUser ? `Bora palpitar, ${currentUser.name.split(" ")[0]}?` : "Dê seu palpite e suba na tabela"}
         </h1>
         <p className="mt-1 text-sm text-white/85 text-pretty">
-          Grupos: exato=<strong>3pts</strong>, vencedor=<strong>1pt</strong> · Elim: +pênaltis=<strong>4pts</strong>
+          Grupos: exato=<strong>3pts</strong>, vencedor=<strong>1pt</strong> · Elim: até <strong>22pts</strong>
         </p>
       </section>
 

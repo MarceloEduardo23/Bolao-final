@@ -283,18 +283,23 @@ function EditMatchDialog({ match, onClose }: { match: Match | null; onClose: () 
   const { updateMatch } = useStore()
   const [home, setHome] = useState(0)
   const [away, setAway] = useState(0)
+  const [homeET, setHomeET] = useState<number | null>(null)
+  const [awayET, setAwayET] = useState<number | null>(null)
   const [homePen, setHomePen] = useState<number | null>(null)
   const [awayPen, setAwayPen] = useState<number | null>(null)
   const [kickoff, setKickoff] = useState("")
   const [finished, setFinished] = useState(false)
 
   const knockout = match?.stage !== "Fase de Grupos"
-  const showPenalties = knockout && finished && home === away
+  const showET = knockout && finished && home === away
+  const showPenalties = showET && homeET !== null && awayET !== null && homeET === awayET
 
   useEffect(() => {
     if (match) {
       setHome(match.homeScore ?? 0)
       setAway(match.awayScore ?? 0)
+      setHomeET(match.homeET ?? null)
+      setAwayET(match.awayET ?? null)
       setHomePen(match.homePenalties ?? null)
       setAwayPen(match.awayPenalties ?? null)
       setKickoff(toLocalInput(match.kickoff))
@@ -312,6 +317,8 @@ function EditMatchDialog({ match, onClose }: { match: Match | null; onClose: () 
       ...match,
       homeScore: finished ? home : null,
       awayScore: finished ? away : null,
+      homeET: (finished && showET) ? homeET : null,
+      awayET: (finished && showET) ? awayET : null,
       homePenalties: (finished && showPenalties) ? homePen : null,
       awayPenalties: (finished && showPenalties) ? awayPen : null,
       finished,
@@ -380,6 +387,19 @@ function EditMatchDialog({ match, onClose }: { match: Match | null; onClose: () 
               <ScoreStepper value={home} onChange={setHome} label={home_team.name} />
               <span className="pb-6 text-lg font-bold text-muted-foreground">x</span>
               <ScoreStepper value={away} onChange={setAway} label={away_team.name} />
+            </div>
+          )}
+
+          {showET && (
+            <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
+              <p className="mb-2 text-center text-xs font-bold text-blue-700 dark:text-blue-400">
+                ⏱️ Prorrogação (empate nos 90')
+              </p>
+              <div className="flex items-center justify-center gap-4">
+                <ScoreStepper value={homeET ?? 0} onChange={setHomeET} label={home_team.name} />
+                <span className="pb-6 text-lg font-bold text-muted-foreground">x</span>
+                <ScoreStepper value={awayET ?? 0} onChange={setAwayET} label={away_team.name} />
+              </div>
             </div>
           )}
 
