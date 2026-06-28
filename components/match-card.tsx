@@ -159,15 +159,15 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
               {knockout ? "Placar nos 90 minutos" : "Placar final"}
             </p>
             <div className="flex items-center justify-center gap-4">
-              <Stepper value={home} onChange={setHome} label={home_team.name} />
+              <Stepper value={home} onChange={setHome} label={home_team.name} dark />
               <span className="pb-6 text-lg font-bold text-muted-foreground">x</span>
-              <Stepper value={away} onChange={setAway} label={away_team.name} />
+              <Stepper value={away} onChange={setAway} label={away_team.name} dark />
             </div>
 
             {/* Prorrogação */}
             {showET && (
               <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
-                <p className="mb-2 text-center text-xs font-bold text-black">
+                <p className="mb-2 text-center text-xs font-bold text-foreground">
                   ⏱️ Empate → placar na prorrogação?
                 </p>
                 <div className="flex items-center justify-center gap-3">
@@ -255,7 +255,7 @@ function StatusBadge({ status, kickoff }: { status: "upcoming" | "live" | "finis
   )
 }
 
-function Stepper({ value, onChange, label, min = 0 }: { value: number; onChange: (v: number) => void; label: string; min?: number }) {
+function Stepper({ value, onChange, label, min = 0, dark = false }: { value: number; onChange: (v: number) => void; label: string; min?: number; dark?: boolean }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
       <div className="flex items-center gap-2">
@@ -267,7 +267,7 @@ function Stepper({ value, onChange, label, min = 0 }: { value: number; onChange:
         >
           <Minus className="size-4" />
         </button>
-        <span className="w-8 text-center text-2xl font-extrabold tabular-nums text-black">{value}</span>
+        <span className={`w-8 text-center text-2xl font-extrabold tabular-nums ${dark ? "text-white" : "text-black"}`}>{value}</span>
         <button
           type="button"
           onClick={() => onChange(Math.min(20, value + 1))}
@@ -276,7 +276,7 @@ function Stepper({ value, onChange, label, min = 0 }: { value: number; onChange:
           <Plus className="size-4" />
         </button>
       </div>
-      <span className="max-w-[5.5rem] truncate text-center text-[11px] font-medium text-muted-foreground">{label}</span>
+      <span className={`max-w-[5.5rem] truncate text-center text-[11px] font-medium ${dark ? "text-white/60" : "text-muted-foreground"}`}>{label}</span>
     </div>
   )
 }
