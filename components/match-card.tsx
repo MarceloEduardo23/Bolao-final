@@ -267,7 +267,7 @@ function Stepper({ value, onChange, label, min = 0, dark = false }: { value: num
         >
           <Minus className="size-4" />
         </button>
-        <span className={`w-8 text-center text-2xl font-extrabold tabular-nums ${dark ? "text-white dark:text-white" : "text-gray-900 dark:text-white"}`}>{value}</span>
+        <span className={`w-8 text-center text-2xl font-extrabold tabular-nums ${dark ? "text-white" : "text-gray-900"}`}>{value}</span>
         <button
           type="button"
           onClick={() => onChange(Math.min(20, value + 1))}
@@ -276,7 +276,7 @@ function Stepper({ value, onChange, label, min = 0, dark = false }: { value: num
           <Plus className="size-4" />
         </button>
       </div>
-      <span className={`max-w-[5.5rem] truncate text-center text-[11px] font-medium ${dark ? "text-white/60 dark:text-white/60" : "text-gray-700 dark:text-white/70"}`}>{label}</span>
+      <span className={`max-w-[5.5rem] truncate text-center text-[11px] font-medium ${dark ? "text-white/70" : "text-gray-600"}`}>{label}</span>
     </div>
   )
 }
