@@ -267,7 +267,7 @@ function Stepper({ value, onChange, label, min = 0 }: { value: number; onChange:
         >
           <Minus className="size-4" />
         </button>
-        <span className="w-8 text-center text-2xl font-extrabold tabular-nums text-foreground">{value}</span>
+        <span className="w-8 text-center text-2xl font-extrabold tabular-nums text-black">{value}</span>
         <button
           type="button"
           onClick={() => onChange(Math.min(20, value + 1))}
