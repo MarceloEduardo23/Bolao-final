@@ -24,7 +24,8 @@ export interface User {
 }
 
 export function isKnockout(m: Match): boolean {
-  return m.stage !== "Fase de Grupos"
+  const s = (m.stage ?? "").toLowerCase()
+  return s !== "fase de grupos"
 }
 
 export function isDrawResult(m: Match): boolean {
