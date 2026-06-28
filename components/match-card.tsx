@@ -167,7 +167,7 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
             {/* Prorrogação */}
             {showET && (
               <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
-                <p className="mb-2 text-center text-xs font-bold text-blue-700 dark:text-blue-400">
+                <p className="mb-2 text-center text-xs font-bold text-foreground">
                   ⏱️ Empate → placar na prorrogação?
                 </p>
                 <div className="flex items-center justify-center gap-3">
