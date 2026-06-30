@@ -68,6 +68,7 @@ export async function GET() {
     const predDrewET = p.homeET !== null && p.homeET === p.awayET
 
     if (exact90 && exactET && exactPen) return 22
+    if (exact90 && exactET && !exactPen) return 18
     if (predDrew90 && exactET && exactPen) return 17
     if (predDrew90 && predDrewET && exactPen) return 12
     return 5

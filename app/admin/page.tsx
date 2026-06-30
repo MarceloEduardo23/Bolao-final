@@ -294,12 +294,19 @@ function EditMatchDialog({ match, onClose }: { match: Match | null; onClose: () 
   const showET = knockout && finished && home === away
   const showPenalties = showET && homeET !== null && awayET !== null && homeET === awayET
 
+  // Quando o jogo passa a empatar nos 90' (foi para prorrogação), o placar da ET
+  // começa a partir do placar dos 90' — a prorrogação CONTINUA o placar, não reinicia.
+  useEffect(() => {
+    if (showET && (homeET === null || homeET < home)) setHomeET(home)
+    if (showET && (awayET === null || awayET < away)) setAwayET(away)
+  }, [showET, home, away])
+
   useEffect(() => {
     if (match) {
       setHome(match.homeScore ?? 0)
       setAway(match.awayScore ?? 0)
-      setHomeET(match.homeET ?? null)
-      setAwayET(match.awayET ?? null)
+      setHomeET(match.homeET ?? match.homeScore ?? null)
+      setAwayET(match.awayET ?? match.awayScore ?? null)
       setHomePen(match.homePenalties ?? null)
       setAwayPen(match.awayPenalties ?? null)
       setKickoff(toLocalInput(match.kickoff))
@@ -391,22 +398,22 @@ function EditMatchDialog({ match, onClose }: { match: Match | null; onClose: () 
           )}
 
           {showET && (
-            <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
-              <p className="mb-2 text-center text-xs font-bold text-blue-700 dark:text-blue-400">
-                ⏱️ Prorrogação (empate nos 90')
+            <div className="rounded-xl bg-muted border border-border p-3">
+              <p className="mb-2 text-center text-xs font-bold text-foreground">
+                ⏱️ Prorrogação (continua do placar dos 90')
               </p>
               <div className="flex items-center justify-center gap-4">
-                <ScoreStepper value={homeET ?? 0} onChange={setHomeET} label={home_team.name} />
+                <ScoreStepper value={homeET ?? home} onChange={setHomeET} label={home_team.name} />
                 <span className="pb-6 text-lg font-bold text-muted-foreground">x</span>
-                <ScoreStepper value={awayET ?? 0} onChange={setAwayET} label={away_team.name} />
+                <ScoreStepper value={awayET ?? away} onChange={setAwayET} label={away_team.name} />
               </div>
             </div>
           )}
 
           {showPenalties && (
-            <div className="rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
-              <p className="mb-2 text-center text-xs font-bold text-amber-700 dark:text-amber-400">
-                ⚽ Pênaltis (empate no tempo normal)
+            <div className="rounded-xl bg-muted border border-border p-3">
+              <p className="mb-2 text-center text-xs font-bold text-foreground">
+                ⚽ Pênaltis (empate na prorrogação)
               </p>
               <div className="flex items-center justify-center gap-4">
                 <ScoreStepper value={homePen ?? 0} onChange={setHomePen} label={home_team.name} />

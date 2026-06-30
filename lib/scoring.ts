@@ -54,21 +54,24 @@ export function etWinner(m: Match): "home" | "away" | null {
  *   - Acertou só o vencedor/empate = 1 pt
  *   - Errou = 0 pts
  *
- * FASE ELIMINATÓRIA — 5 cenários:
+ * FASE ELIMINATÓRIA — 6 cenários:
  *
  * 1. GABARITO SUPREMO (22 pts)
  *    Placar 90' exato + prorrogação exata + pênaltis exatos + classificado certo
  *
- * 2. O EMPATE PERFEITO (17 pts)
+ * 2. QUASE PERFEITO (18 pts)
+ *    Placar 90' exato + prorrogação exata + ERROU os pênaltis + classificado certo
+ *
+ * 3. O EMPATE PERFEITO (17 pts)
  *    Errou o placar dos 90' (mas previu empate) + cravou prorrogação + pênaltis exatos + classificado certo
  *
- * 3. DECISÃO NOS PÊNALTIS (12 pts)
+ * 4. DECISÃO NOS PÊNALTIS (12 pts)
  *    Errou 90' (previu empate) + errou prorrogação (previu empate) + pênaltis exatos + classificado certo
  *
- * 4. CRAVOU NO TEMPO NORMAL (12 pts)
+ * 5. CRAVOU NO TEMPO NORMAL (12 pts)
  *    Placar exato em jogo resolvido nos 90' + classificado certo
  *
- * 5. ACERTOU SÓ O CLASSIFICADO (5 pts)
+ * 6. ACERTOU SÓ O CLASSIFICADO (5 pts)
  *    Errou todos os placares, mas o time que o usuário apostou para passar passou
  */
 export function scorePrediction(p: Prediction, m: Match): number {
@@ -176,6 +179,12 @@ export function scorePrediction(p: Prediction, m: Match): number {
   // Placar 90' exato + ET exata + pênaltis exatos + classificado
   if (exact90 && exactET && exactPen && correctWinner) {
     return 22
+  }
+
+  // CENÁRIO NOVO: Quase Perfeito (18 pts)
+  // Placar 90' exato + ET exata + ERROU os pênaltis + classificado certo
+  if (exact90 && exactET && !exactPen && correctWinner) {
+    return 18
   }
 
   // CENÁRIO 2: O Empate Perfeito (17 pts)

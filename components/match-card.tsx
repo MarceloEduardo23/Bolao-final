@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { type Match } from "@/lib/matches-data"
 import { canPredict, matchStatus, scorePrediction, isKnockout, penaltyWinner } from "@/lib/scoring"
 import { useStore } from "@/lib/store"
@@ -45,6 +45,12 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
   const showET = knockout && home === away
   // Pênaltis aparecem quando apostou empate na prorrogação também
   const showPenalties = showET && homeET === awayET
+
+  // A prorrogação CONTINUA o placar dos 90' — não recomeça do zero
+  useEffect(() => {
+    if (showET && homeET < home) setHomeET(home)
+    if (showET && awayET < away) setAwayET(away)
+  }, [showET, home, away])
 
   async function handleSave() {
     setSaving(true)
@@ -171,9 +177,9 @@ export function MatchCard({ match, index = 0 }: { match: Match; index?: number }
                   ⏱️ Empate → placar na prorrogação?
                 </p>
                 <div className="flex items-center justify-center gap-3">
-                  <Stepper value={homeET} onChange={setHomeET} label={home_team.name} min={0} />
+                  <Stepper value={homeET} onChange={setHomeET} label={home_team.name} min={home} />
                   <span className="pb-6 text-sm font-bold text-muted-foreground">ET</span>
-                  <Stepper value={awayET} onChange={setAwayET} label={away_team.name} min={0} />
+                  <Stepper value={awayET} onChange={setAwayET} label={away_team.name} min={away} />
                 </div>
                 {homeET === awayET && (
                   <p className="mt-1 text-center text-[11px] text-muted-foreground">
@@ -283,6 +289,7 @@ function Stepper({ value, onChange, label, min = 0 }: { value: number; onChange:
 
 function pointsLabel(pts: number): string {
   if (pts === 22) return "⭐ Gabarito Supremo +22"
+  if (pts === 18) return "💎 Quase Perfeito +18"
   if (pts === 17) return "🔥 Empate Perfeito +17"
   if (pts === 12) return "✅ Cravou +12"
   if (pts === 5)  return "👍 Classificado +5"
@@ -293,6 +300,7 @@ function pointsLabel(pts: number): string {
 
 function pointsColor(pts: number): string {
   if (pts === 22) return "bg-yellow-400 text-yellow-900 dark:bg-yellow-500 dark:text-yellow-950"
+  if (pts === 18) return "bg-purple-500 text-white dark:bg-purple-400 dark:text-purple-950"
   if (pts === 17) return "bg-orange-500 text-white dark:bg-orange-400 dark:text-orange-950"
   if (pts === 12) return "bg-primary text-primary-foreground"
   if (pts === 5)  return "bg-blue-500 text-white dark:bg-blue-400 dark:text-blue-950"
