@@ -179,8 +179,8 @@ export default function ChaveamentoPage() {
       {hasAnyMatch && (
         <>
           {/* ── BRACKET DESKTOP/TABLET: lado a lado ── */}
-          <div className="hidden md:block overflow-x-auto">
-            <div className="flex items-center justify-center gap-3 min-w-[900px] px-2">
+          <div className="hidden md:block overflow-x-auto -mx-4 px-4 pb-2">
+            <div className="flex items-center justify-center gap-3 min-w-[920px] w-max mx-auto px-6">
               {/* LADO ESQUERDO */}
               <BracketColumnGroup
                 r16Top={LEFT_R16} r16Bot={LEFT_R16_B}
@@ -207,6 +207,10 @@ export default function ChaveamentoPage() {
               />
             </div>
           </div>
+
+          <p className="hidden md:block text-center text-[11px] text-muted-foreground">
+            👈 Arraste para os lados para ver o chaveamento completo
+          </p>
 
           {/* ── BRACKET MOBILE: lista vertical agrupada ── */}
           <div className="flex flex-col gap-5 md:hidden">

@@ -24,7 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { ShieldCheck, Pencil, Trash2, Minus, Plus, Swords, RefreshCw } from "lucide-react"
+import { ShieldCheck, Pencil, Trash2, Minus, Plus, Swords, RefreshCw, BarChart3, X, CheckCircle2, XCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 function initials(name: string) {
@@ -36,10 +36,14 @@ function initials(name: string) {
     .toUpperCase()
 }
 
+type StageFilter = "all" | "Fase de Grupos" | "Oitavas"
+
 export default function AdminPage() {
   const { currentUser, matches, users, deleteUser } = useStore()
   const router = useRouter()
   const [editing, setEditing] = useState<Match | null>(null)
+  const [viewingUser, setViewingUser] = useState<{ id: string; name: string } | null>(null)
+  const [stageFilter, setStageFilter] = useState<StageFilter>("all")
 
   useEffect(() => {
     if (currentUser === null) {
@@ -112,9 +116,15 @@ export default function AdminPage() {
     }
   }
 
-  const sorted = [...matches].sort(
-    (a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime(),
-  )
+  const sorted = [...matches]
+    .filter(m => stageFilter === "all" ? true : m.stage === stageFilter)
+    .sort((a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime())
+
+  const stageOptions: { value: StageFilter; label: string }[] = [
+    { value: "all", label: "Todos" },
+    { value: "Fase de Grupos", label: "Fase de Grupos" },
+    { value: "Oitavas", label: "16 avos" },
+  ]
 
   return (
     <div className="flex flex-col gap-5">
@@ -155,6 +165,34 @@ export default function AdminPage() {
         )}
 
         <TabsContent value="matches" className="mt-4 flex flex-col gap-3">
+          {/* Filtro de fase */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            {stageOptions.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setStageFilter(opt.value)}
+                className={cn(
+                  "shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition",
+                  stageFilter === opt.value
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-secondary text-secondary-foreground"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+            <span className="ml-auto shrink-0 text-[11px] text-muted-foreground">
+              {sorted.length} jogo{sorted.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          {sorted.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
+              Nenhum jogo nesse filtro.
+            </div>
+          )}
+
           {sorted.map((m) => {
             const status = matchStatus(m)
             return (
@@ -224,6 +262,17 @@ export default function AdminPage() {
                     <Button
                       size="icon"
                       variant="outline"
+                      className="size-9 rounded-xl"
+                      onClick={() => setViewingUser({ id: u.id, name: u.name })}
+                      aria-label="Ver pontuação detalhada"
+                    >
+                      <BarChart3 className="size-4" />
+                    </Button>
+                  )}
+                  {u.role !== "admin" && (
+                    <Button
+                      size="icon"
+                      variant="outline"
                       className="size-9 rounded-xl text-destructive hover:text-destructive"
                       onClick={() => {
                         deleteUser(u.id).then(() => toast.success(`${u.name} removido.`))
@@ -269,6 +318,7 @@ export default function AdminPage() {
       </Tabs>
 
       <EditMatchDialog match={editing} onClose={() => setEditing(null)} />
+      <UserPredictionsDialog user={viewingUser} onClose={() => setViewingUser(null)} />
     </div>
   )
 }
@@ -474,5 +524,185 @@ function ScoreStepper({
         {label}
       </span>
     </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Modal: pontuação detalhada de um usuário (estilo "Hoje / Próximos / Anteriores")
+// ─────────────────────────────────────────────────────────────────────────
+
+interface PredItem {
+  match: Match
+  prediction: {
+    matchId: string
+    home: number
+    away: number
+    homeET: number | null
+    awayET: number | null
+    homePenalties: number | null
+    awayPenalties: number | null
+  } | null
+  points: number | null
+}
+
+function pointsBadgeClass(pts: number): string {
+  if (pts === 22) return "bg-yellow-400 text-yellow-900 dark:bg-yellow-500 dark:text-yellow-950"
+  if (pts === 18) return "bg-purple-500 text-white dark:bg-purple-400 dark:text-purple-950"
+  if (pts === 17) return "bg-orange-500 text-white dark:bg-orange-400 dark:text-orange-950"
+  if (pts === 12) return "bg-primary text-primary-foreground"
+  if (pts === 5)  return "bg-blue-500 text-white dark:bg-blue-400 dark:text-blue-950"
+  if (pts === 3)  return "bg-primary text-primary-foreground"
+  if (pts === 1)  return "bg-accent text-accent-foreground"
+  return "bg-muted text-muted-foreground"
+}
+
+function UserPredictionsDialog({ user, onClose }: { user: { id: string; name: string } | null; onClose: () => void }) {
+  const [items, setItems] = useState<PredItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [tab, setTab] = useState<"finished" | "pending">("finished")
+
+  useEffect(() => {
+    if (!user) return
+    setLoading(true)
+    fetch(`/api/admin/user-predictions/${user.id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setItems(data.items ?? [])
+      })
+      .catch(() => toast.error("Erro ao carregar palpites do usuário."))
+      .finally(() => setLoading(false))
+  }, [user])
+
+  if (!user) return null
+
+  const finishedItems = items
+    .filter((it) => it.match.finished)
+    .sort((a, b) => new Date(b.match.kickoff).getTime() - new Date(a.match.kickoff).getTime())
+
+  const pendingItems = items
+    .filter((it) => !it.match.finished)
+    .sort((a, b) => new Date(a.match.kickoff).getTime() - new Date(b.match.kickoff).getTime())
+
+  const totalPoints = finishedItems.reduce((sum, it) => sum + (it.points ?? 0), 0)
+  const list = tab === "finished" ? finishedItems : pendingItems
+
+  return (
+    <Dialog open={!!user} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-lg rounded-2xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+        <DialogHeader className="p-5 pb-3 shrink-0">
+          <DialogTitle className="flex items-center justify-between gap-2">
+            <span>Pontuação de {user.name}</span>
+          </DialogTitle>
+          <div className="mt-2 flex items-center gap-2 rounded-xl bg-primary/10 px-3 py-2">
+            <BarChart3 className="size-4 text-primary shrink-0" />
+            <span className="text-sm font-bold text-primary">{totalPoints} pontos no total</span>
+            <span className="ml-auto text-xs text-muted-foreground">{finishedItems.length} jogo(s) avaliado(s)</span>
+          </div>
+        </DialogHeader>
+
+        <div className="flex gap-2 px-5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setTab("finished")}
+            className={cn(
+              "flex-1 rounded-full py-1.5 text-xs font-bold transition",
+              tab === "finished" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+            )}
+          >
+            Encerrados ({finishedItems.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("pending")}
+            className={cn(
+              "flex-1 rounded-full py-1.5 text-xs font-bold transition",
+              tab === "pending" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+            )}
+          >
+            Pendentes ({pendingItems.length})
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-2.5">
+          {loading && (
+            <div className="flex items-center justify-center py-10 text-sm text-muted-foreground">
+              <RefreshCw className="size-4 animate-spin mr-2" /> Carregando...
+            </div>
+          )}
+
+          {!loading && list.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
+              Nenhum jogo aqui.
+            </div>
+          )}
+
+          {!loading && list.map((it) => {
+            const homeTeam = getTeam(it.match.homeId)
+            const awayTeam = getTeam(it.match.awayId)
+            const hasPred = !!it.prediction
+
+            return (
+              <div key={it.match.id} className="rounded-2xl border border-border bg-card p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-secondary-foreground">
+                    {it.match.group}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {new Date(it.match.kickoff).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-1 items-center gap-1.5 min-w-0">
+                    <Flag teamId={it.match.homeId} size={22} />
+                    <span className="truncate text-xs font-bold text-foreground">{homeTeam.name}</span>
+                  </div>
+                  <span className="shrink-0 text-xs font-extrabold tabular-nums text-foreground">
+                    {it.match.finished ? `${it.match.homeScore} - ${it.match.awayScore}` : "vs"}
+                  </span>
+                  <div className="flex flex-1 flex-row-reverse items-center gap-1.5 min-w-0">
+                    <Flag teamId={it.match.awayId} size={22} />
+                    <span className="truncate text-xs font-bold text-foreground">{awayTeam.name}</span>
+                  </div>
+                </div>
+
+                <div className="mt-2 flex items-center justify-between gap-2 border-t border-dashed border-border pt-2">
+                  {hasPred ? (
+                    <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <CheckCircle2 className="size-3.5 text-primary shrink-0" />
+                      Palpitou: <strong className="text-foreground">{it.prediction!.home} x {it.prediction!.away}</strong>
+                      {it.prediction!.homeET !== null && it.prediction!.awayET !== null && (
+                        <span>· ET {it.prediction!.homeET}x{it.prediction!.awayET}</span>
+                      )}
+                      {it.prediction!.homePenalties !== null && it.prediction!.awayPenalties !== null && (
+                        <span>· Pen {it.prediction!.homePenalties}x{it.prediction!.awayPenalties}</span>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <XCircle className="size-3.5 text-destructive shrink-0" />
+                      Não palpitou
+                    </span>
+                  )}
+
+                  {it.match.finished && it.points !== null && (
+                    <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold", pointsBadgeClass(it.points))}>
+                      +{it.points} pts
+                    </span>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <DialogFooter className="p-4 pt-2 shrink-0 border-t border-border">
+          <Button variant="outline" onClick={onClose} className="w-full rounded-xl">
+            <X className="size-4 mr-1.5" />
+            Fechar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
